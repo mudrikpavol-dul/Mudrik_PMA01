@@ -1,8 +1,21 @@
 
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, Button, Pressable} from 'react-native';
 
 export default function App() {
+
+  const [inputText, setInputText] = useState('');
+  const [taskList, setTaskList] = useState([]);
+
+  function inputTextHandler (text) {
+    setInputText(text);
+  }
+
+  function addTaskHandler () {
+    setTaskList((currentTaskList) => [...currentTaskList, inputText]);
+  }
+
   return (
     <View style={styles.container}>
 
@@ -10,14 +23,18 @@ export default function App() {
         <TextInput
           style={styles.input}
           placeholder="Zadaj ulohu:"
+          onChangeText={inputTextHandler}
         />
-        <Button title="ADD" />
+        <Button title="ADD" onPress={addTaskHandler} />
       </View>
 
       <View style={styles.taskContainer}>
-        <Text>UDÁLOSTI......</Text>
+        {taskList.map((task) => (
+          <Pressable style={styles.taskItem} onPress={console.log('Pressed')}>
+            <Text>{task}</Text>
+          </Pressable>
+        ))}
       </View>
-
       <StatusBar style="auto" />
     </View>
   );
@@ -50,7 +67,15 @@ const styles = StyleSheet.create({
 
   taskContainer: {
     flex: 4,
-    padding: 24,
+    padding: 5,
     borderTopWidth: 3,
+  },
+
+  taskItem: {
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#e4fbfb',
+    marginVertical: 2,
+    borderRadius: 10,
   },
 });
