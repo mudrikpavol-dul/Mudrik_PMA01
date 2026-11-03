@@ -1,19 +1,32 @@
-
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, Pressable} from 'react-native';
+import Item from './src/components/items';
+import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
 
 export default function App() {
 
   const [inputText, setInputText] = useState('');
   const [taskList, setTaskList] = useState([]);
 
-  function inputTextHandler (text) {
+  function inputTextHandler(text) {
     setInputText(text);
   }
 
-  function addTaskHandler () {
-    setTaskList((currentTaskList) => [...currentTaskList, inputText]);
+  function addTaskHandler() {
+    let id = "id" + Math.random().toString(16).slice(2);
+
+    setTaskList((currentTaskList) => [
+      ...currentTaskList,
+      { id: id, title: inputText, done: false }
+    ]);
+
+    setInputText('');
+}
+
+  function deleteTaskHandler(id) {
+    setTaskList((currentTaskList) =>
+      currentTaskList.filter((task) => task.id !== id)
+    );
   }
 
   return (
@@ -21,20 +34,20 @@ export default function App() {
 
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="Zadaj ulohu:"
-          onChangeText={inputTextHandler}
-        />
+            style={styles.input}
+            placeholder="Zadaj ulohu:"
+            value={inputText}
+            onChangeText={inputTextHandler}
+/>  
         <Button title="ADD" onPress={addTaskHandler} />
       </View>
 
-      <View style={styles.taskContainer}>
-        {taskList.map((task) => (
-          <Pressable style={styles.taskItem} onPress={console.log('Pressed')}>
-            <Text>{task}</Text>
-          </Pressable>
-        ))}
-      </View>
+      <FlatList
+        data={taskList}
+        renderItem={({ item }) => <Item item={item} onDelete={deleteTaskHandler} />}
+        keyExtractor={item => item.id}
+      />
+
       <StatusBar style="auto" />
     </View>
   );
@@ -45,7 +58,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d2c8c8',
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 20,
   },
 
   inputContainer: {
@@ -54,6 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 12,
+    bottomBorderWidth: 3,
   },
 
   input: {
@@ -68,7 +82,6 @@ const styles = StyleSheet.create({
   taskContainer: {
     flex: 4,
     padding: 5,
-    borderTopWidth: 3,
   },
 
   taskItem: {
